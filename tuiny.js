@@ -117,8 +117,8 @@ Element.implement(
 
 
 	Options:
-		x - (integer) X-position at screen (default: false).
-		y - (integer) Y-position at screen (default: false).
+		position - (object|string) Position at screen
+			(default: 'center').
 		width - (integer) Width at creation (default: 300).
 		height - (integer) Height at creation (default: 200).
 		resizable - (boolean) The user can resize the frame
@@ -138,8 +138,7 @@ Tuiny.Frame = new Class(
 
 	options:
 	{
-		x: false,
-		y: false,
+		position: 'center',
 		width: 300,
 		height: 200,
 		resizable: true,
@@ -166,6 +165,125 @@ Tuiny.Frame = new Class(
 
 		this.container = params.container || $( document.body );
 		this.build();
+
+		this.move( this.options.position );
+	},
+
+	/*
+		Method: move
+
+		Moves the frame.
+
+		Position argument:
+
+			There are two ways to specify the position: strings and objects.
+
+			The strings are combinations of "left", "right", and "center"
+			with "top" (or "upper"), "bottom", and "center".
+
+			These are case insensitive.
+
+			These translate to:
+
+			o	upperLeft, topLeft (same thing) - or upperleft, leftupper, LEFTUPPER etc.
+			o	bottomLeft
+			o	centerLeft
+			o	upperRight, topRight (same thing)
+			o	bottomRight
+			o	centerRight
+			o	centerTop
+			o	centerBottom
+			o	center
+
+			Alternatively, you can be a little more expicit by using an
+			object with x and y values.
+
+			Acceptable values for the x axis are "left", "right", and "center",
+			and for y you can use "top", "bottom" and "center",
+			and for both you can use integer values in pixels.
+
+			>	{x: 'left', y: 'top'} // same as "upperLeft" or "topLeft"
+			>	{x: 'left', y: 'bottom'} // same as "bottomLeft"
+			>	{x: 200, y: 200} // left: 200px, top: 200px
+			>	{x: 200, y: 'bottom'} // left: 200px, "bottom"
+			>	etc.
+
+		Syntax:
+			> frame.move( position );
+
+		Parameters:
+			position - (object|string) Position at screen.
+
+		Example:
+			>	// By string
+			>	myFrame.move( 'center' );
+			>	myFrame.move( 'UPPERleft' );
+			>
+			>	// By object of strings
+			>	myFrame.move( { x: 'left', y: 'bottom' } );
+			>	myFrame.move( { x: 'center', y: 'center' } );
+			>
+			>	// By object of integers
+			>	myFrame.move( { x: 200, y: 200 } );
+			>
+			>	// Mixed
+			>	myFrame.move( { x: 'center', y: 200 } );
+			>	myFrame.move( { x: 400, y: 'bottom' } );
+	*/
+	move: function( position )
+	{
+		var winSize = window.getSize();
+		var elSize  = this.element.getSize();
+		var elPosition = this.element.getPosition();
+
+		var strToObj =
+		{
+			'upperleft':    { x: 'left', y: 'top' },
+			'topleft':      { x: 'left', y: 'top' },
+			'bottomleft':   { x: 'left', y: 'bottom' },
+			'centerleft':   { x: 'left', y: 'center' },
+			'upperright':   { x: 'right', y: 'top' },
+			'topright':     { x: 'right', y: 'top' },
+			'bottomright':  { x: 'right', y: 'bottom' },
+			'centerright':  { x: 'right', y: 'center' },
+			'centertop':    { x: 'center', y: 'top' },
+			'centerbottom': { x: 'center', y: 'bottom' },
+			'center':       { x: 'center', y: 'center' },
+			'left':         { x: 'left', y: elPosition.y },
+			'right':        { x: 'right', y: elPosition.y },
+			'top':          { x: elPosition.x, y: 'top' },
+			'bottom':       { x: elPosition.x, y: 'bottom' }
+		};
+
+		var strToIntX =
+		{
+			'left':   0,
+			'right':  Math.max( 0, winSize.x - elSize.x ),
+			'center': Math.max( 0, winSize.x / 2 - elSize.x / 2 )
+		};
+
+		var strToIntY =
+		{
+			'top':    0,
+			'bottom': Math.max( 0, winSize.y - elSize.y ),
+			'center': Math.max( 0, winSize.y / 2 - elSize.y / 2 )
+		};
+
+		if ( instanceOf( position, String ) )
+		{
+			var key = position.toLowerCase();
+			position = strToObj[ key ];
+		}
+
+		if ( instanceOf( position.x, Number ) )
+			this.element.setStyle( 'left', position.x );
+		else
+			this.element.setStyle( 'left', strToIntX[ position.x.toLowerCase() ] );
+
+		if ( instanceOf( position.y, Number ) )
+			this.element.setStyle( 'top', position.y );
+		else
+			this.element.setStyle( 'top', strToIntY[ position.y.toLowerCase() ] );
 	},
 
 	/*
