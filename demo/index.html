@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+	<head>
+		<title>Tuiny demo</title>
+		<meta name="description" content="Tuiny basic example" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Language" content="fr" />
+		<meta http-equiv="Content-Script-Type" content="text/javascript" />
+		<link href="../tuiny.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="mootools-core-1.3-full-nocompat.js"></script>
+		<script type="text/javascript" src="mootools-more.js"></script>
+		<script type="text/javascript" src="../tuiny.js"></script>
+		<script type="text/javascript"><!--
+
+		window.addEvent( 'domready', function()
+		{
+			var myWindow = new Tuiny.Window( { label: 'My window' } );
+
+			// Close button
+			myWindow.getControlBar().adopt( new Tuiny.Button(
+			{
+				'label': ' x ',
+				'events': { 'click': myWindow.close.bind( myWindow ) }
+			}));
+
+			// Collapse button
+			myWindow.getControlBar().adopt( new Tuiny.Button(
+			{
+				'label': ' _ ',
+				'events': { 'click': myWindow.toggleCollapse.bind( myWindow ) }
+			}));
+
+			myWindow.getContent().set( 'text', 'Hello world!' );
+		});
+
+		--></script>
+	</head>
+	<body>
+		<div id="page">
+			<h1>Tuiny demo</h1>
+			<p>This is a basic example.</p>
+		</div>
+	</body>
+</html>
