@@ -1013,11 +1013,11 @@ Tuiny.Slideshow = new Class(
 	show: function( i )
 	{
 		if ( this.currentIndex == i ) return;
-		this.pause();
+		this.stop();
 		this.fadeCurrentOut();
 		this.currentIndex = i;
 		this.fadeCurrentIn();
-		this.resume();
+		this.play();
 	},
 
 	/*
@@ -1073,32 +1073,32 @@ Tuiny.Slideshow = new Class(
 	},
 
 	/*
-		Method: pause
-
-		Stops immediately the slideshow.
-
-		Syntax:
-			> mySlideshow.pause();
-	*/
-	pause: function()
-	{
-		clearInterval( this.interval );
-		this.interval = false;
-	},
-
-	/*
-		Method: resume
+		Method: play
 
 		Resumes immediately the slideshow.
 
 		Syntax:
-			> mySlideshow.resume();
+			> mySlideshow.play();
 	*/
-	resume: function()
+	play: function()
 	{
 		if ( this.interval )
 			clearInterval( this.interval );
 		this.interval = this.callback.periodical( this.options.period, this );
+	},
+
+	/*
+		Method: stop
+
+		Pauses immediately the slideshow.
+
+		Syntax:
+			> mySlideshow.stop();
+	*/
+	stop: function()
+	{
+		clearInterval( this.interval );
+		this.interval = false;
 	},
 
 	build: function()
@@ -1145,7 +1145,7 @@ Tuiny.Slideshow = new Class(
 		// Starts when the page loading is finished
 		window.addEvent( 'load', function()
 		{
-			this.resume();
+			this.play();
 		}.bind( this ));
 	},
 
