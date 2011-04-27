@@ -980,7 +980,7 @@ Tuiny.Slideshow = new Class(
 		Parameters:
 			options - (object) The options.
 			container - (Element) The container element.
-			images - (array) Buttons or widgets.
+			images - (array) The url or Elements of the images.
 	*/
 	initialize: function()
 	{
