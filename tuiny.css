@@ -217,6 +217,23 @@
 	background: #000;
 }
 
+/* Tuiny.Tree */
+
+.tuiny-tree
+{
+}
+
+.tuiny-tree-clone
+{
+	position: absolute; /* ! */
+	opacity: 0.7;
+}
+
+.tuiny-tree-cart
+{
+	background: #cce;
+}
+
 /* Tuiny.Table */
 
 .tuiny-table
@@ -253,3 +270,19 @@
 	background: #999;
 }
 
+/* Tuiny.Slideshow */
+
+.tuiny-slideshow
+{
+	width: 600px;
+	height: 400px;
+	background: black;
+	border: 8px solid white;
+}
+
+.tuiny-slideshow img
+{
+	position: absolute; /* ! */
+	width: 600px;
+	height: 400px;
+}
