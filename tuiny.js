@@ -956,7 +956,9 @@ Tuiny.Table = new Class(
 
 	Options:
 		images - (array) The url or Elements of the images.
-		period - (number) The duration of the intervals between images.
+		period - (number) The duration of the intervals between images (ms).
+		duration - (number) The duration of the transition (ms).
+		transition - (object) Transition type (see Fx.Transitions).
 		classSlideshow - (string) The class of the slideshow container
 			(default: 'tuiny-slideshow').
 */
@@ -968,6 +970,8 @@ Tuiny.Slideshow = new Class(
 	{
 		images: null,
 		period: 3000,
+		duration: 'long',
+		transition: Fx.Transitions.linear,
 		classSlideshow: 'tuiny-slideshow'
 	},
 
@@ -989,6 +993,9 @@ Tuiny.Slideshow = new Class(
 		this.container = $( params.container ) || $( document.body );
 		this.images = params.images || this.options.images;
 
+		this.currentIndex = 0;
+		this.interval = false;
+
 		this.build();
 	},
 
@@ -1007,9 +1014,9 @@ Tuiny.Slideshow = new Class(
 	{
 		if ( this.currentIndex == i ) return;
 		this.pause();
-		this.images[ this.currentIndex ].fade( 'out' );
+		this.fadeCurrentOut();
 		this.currentIndex = i;
-		this.images[ this.currentIndex ].fade( 'in' );
+		this.fadeCurrentIn();
 		this.resume();
 	},
 
@@ -1076,7 +1083,7 @@ Tuiny.Slideshow = new Class(
 	pause: function()
 	{
 		clearInterval( this.interval );
-		this.interval = null;
+		this.interval = false;
 	},
 
 	/*
@@ -1097,9 +1104,6 @@ Tuiny.Slideshow = new Class(
 	build: function()
 	{
 		this.element = new Element( 'div', { 'class': this.options.classSlideshow });
-
-		// Current index
-		this.currentIndex = 0;
 
 		// Array of urls or Element
 		if ( instanceOf( this.images, Array ) )
@@ -1125,25 +1129,40 @@ Tuiny.Slideshow = new Class(
 
 		// Hide the images, but not the first
 		this.images.each( function( item, index )
-		{ 
+		{
+			item.set( 'tween',
+			{
+				transition: this.options.transition,
+				duration: this.options.duration
+			});
 			if ( index > 0 )
 				item.set( 'opacity', 0 );
-		});
+		}.bind( this ));
+
+		this.element.adopt( this.images );
+		this.container.grab( this.element );
 
 		// Starts when the page loading is finished
 		window.addEvent( 'load', function()
 		{
 			this.resume();
 		}.bind( this ));
+	},
 
-		this.element.adopt( this.images );
-		this.container.grab( this.element );
+	fadeCurrentIn: function()
+	{
+		this.images[ this.currentIndex ].fade( 'in' );
+	},
+
+	fadeCurrentOut: function()
+	{
+		this.images[ this.currentIndex ].fade( 'out' );
 	},
 
 	callback: function()
 	{
-		this.images[ this.currentIndex ].fade( 'out' );
+		this.fadeCurrentOut();
 		this.currentIndex = ( this.currentIndex + 1 ) % this.images.length;
-		this.images[ this.currentIndex ].fade( 'in' );
+		this.fadeCurrentIn();
 	}
 });
