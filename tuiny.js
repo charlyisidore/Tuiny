@@ -9,7 +9,7 @@ Author:
 	Charly LERSTEAU
 
 Date:
-	2011-03-01
+	2011-04-27
 
 License:
 	MIT style license
@@ -924,7 +924,7 @@ Tuiny.Table = new Class(
 		classZebra: 'tuiny-table-tr-odd',
 		classRowSelected: 'tuiny-table-tr-selected',
 		classRowHovered: 'tuiny-table-tr-hovered',
-		classSelectable: 'tuiny-table-tr-selectable',
+		classSelectable: 'tuiny-table-tr-selectable'
 	},
 
 	/*
@@ -943,6 +943,106 @@ Tuiny.Table = new Class(
 		var params = Array.link( arguments, { options: Type.isObject, table: Type.isElement } );
 		this.parent( params.table, params.options );
 		this.toElement().store( 'widget', this );
-	},
+	}
 });
 
+/*
+	Class: Tuiny.Slideshow
+
+	A slideshow displaying photos.
+
+	Extends:
+		<Tuiny.Widget>
+
+	Options:
+		images - (array) The url or Elements of the images.
+		period - (number) The duration of the intervals between images.
+		classSlideshow - (string) The class of the slideshow container
+			(default: 'tuiny-slideshow').
+*/
+Tuiny.Slideshow = new Class(
+{
+	Extends: Tuiny.Widget,
+
+	options:
+	{
+		images: null,
+		period: 3000,
+		classSlideshow: 'tuiny-slideshow'
+	},
+
+	/*
+		Constructor: Tuiny.Slideshow
+
+		Syntax:
+			> var mySlideshow = new Tuiny.Slideshow([container, options, images]);
+
+		Parameters:
+			options - (object) The options.
+			container - (Element) The container element.
+			images - (array) Buttons or widgets.
+	*/
+	initialize: function()
+	{
+		var params = Array.link( arguments, { options: Type.isObject, container: Type.isElement, images: Type.isArray } );
+		this.setOptions( params.options );
+		this.container = $( params.container ) || $( document.body );
+		this.images = params.images || this.options.images;
+
+		this.build();
+	},
+
+	build: function()
+	{
+		this.element = new Element( 'div', { 'class': this.options.classSlideshow });
+
+		// Current index
+		this.currentIndex = 0;
+
+		// Array of urls or Element
+		if ( instanceOf( this.images, Array ) )
+		{
+			this.images.each( function( item, index, imgs )
+			{
+				// If item is an url, converts it to an Element
+				if ( instanceOf( item, String ) )
+				{
+					imgs[ index ] = new Element( 'img',
+					{
+						src: item,
+						alt: '[ Image '+index+' ]'
+					});
+				}
+			});
+		}
+		// Otherwise, we take img Elements from the container
+		else
+		{
+			this.images = this.container.getElements( 'img' );
+		}
+
+		// Hide the images, but not the first
+		this.images.each( function( item, index )
+		{ 
+			if ( index > 0 )
+				item.set( 'opacity', 0 );
+		});
+
+		// Function called periodically
+		this.showFunction = function()
+		{
+			this.images[ this.currentIndex ].fade( 'out' );
+			this.currentIndex = this.currentIndex < this.images.length - 1 ? this.currentIndex + 1 : 0;
+			this.images[ this.currentIndex ].fade( 'in' );
+		};
+
+		// Starts when the page loading is finished
+		window.addEvent( 'load', function()
+		{
+			this.interval = this.showFunction.periodical( this.options.period, this );
+		}.bind( this ));
+
+		this.element.adopt( this.images );
+		this.container.grab( this.element );
+	}
+});
