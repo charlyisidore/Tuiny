@@ -980,7 +980,7 @@ Tuiny.Slideshow = new Class(
 		Parameters:
 			options - (object) The options.
 			container - (Element) The container element.
-			images - (array) The images.
+			images - (array) Buttons or widgets.
 	*/
 	initialize: function()
 	{
@@ -990,6 +990,108 @@ Tuiny.Slideshow = new Class(
 		this.images = params.images || this.options.images;
 
 		this.build();
+	},
+
+	/*
+		Method: show
+
+		Shows immediately the nth image.
+
+		Syntax:
+			> mySlideshow.show( n );
+
+		Parameters:
+			n - (number) The index of the image.
+	*/
+	show: function( i )
+	{
+		if ( this.currentIndex == i ) return;
+		this.pause();
+		this.images[ this.currentIndex ].fade( 'out' );
+		this.currentIndex = i;
+		this.images[ this.currentIndex ].fade( 'in' );
+		this.resume();
+	},
+
+	/*
+		Method: first
+
+		Shows immediately the first image.
+
+		Syntax:
+			> mySlideshow.first();
+	*/
+	first: function()
+	{
+		this.show( 0 );
+	},
+
+	/*
+		Method: last
+
+		Shows immediately the last image.
+
+		Syntax:
+			> mySlideshow.last();
+	*/
+	last: function()
+	{
+		this.show( this.images.length - 1 );
+	},
+
+	/*
+		Method: previous
+
+		Shows immediately the previous image.
+
+		Syntax:
+			> mySlideshow.previous();
+	*/
+	previous: function()
+	{
+		this.show( this.currentIndex > 0 ? this.currentIndex - 1 : this.images.length - 1 );
+	},
+
+	/*
+		Method: next
+
+		Shows immediately the next image.
+
+		Syntax:
+			> mySlideshow.next();
+	*/
+	next: function()
+	{
+		this.show( ( this.currentIndex + 1 ) % this.images.length );
+	},
+
+	/*
+		Method: pause
+
+		Stops immediately the slideshow.
+
+		Syntax:
+			> mySlideshow.pause();
+	*/
+	pause: function()
+	{
+		clearInterval( this.interval );
+		this.interval = null;
+	},
+
+	/*
+		Method: resume
+
+		Resumes immediately the slideshow.
+
+		Syntax:
+			> mySlideshow.resume();
+	*/
+	resume: function()
+	{
+		if ( this.interval )
+			clearInterval( this.interval );
+		this.interval = this.callback.periodical( this.options.period, this );
 	},
 
 	build: function()
@@ -1028,21 +1130,20 @@ Tuiny.Slideshow = new Class(
 				item.set( 'opacity', 0 );
 		});
 
-		// Function called periodically
-		this.showFunction = function()
-		{
-			this.images[ this.currentIndex ].fade( 'out' );
-			this.currentIndex = this.currentIndex < this.images.length - 1 ? this.currentIndex + 1 : 0;
-			this.images[ this.currentIndex ].fade( 'in' );
-		};
-
 		// Starts when the page loading is finished
 		window.addEvent( 'load', function()
 		{
-			this.interval = this.showFunction.periodical( this.options.period, this );
+			this.resume();
 		}.bind( this ));
 
 		this.element.adopt( this.images );
 		this.container.grab( this.element );
+	},
+
+	callback: function()
+	{
+		this.images[ this.currentIndex ].fade( 'out' );
+		this.currentIndex = ( this.currentIndex + 1 ) % this.images.length;
+		this.images[ this.currentIndex ].fade( 'in' );
 	}
 });
