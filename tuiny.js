@@ -955,7 +955,7 @@ Tuiny.Table = new Class(
 		<Tuiny.Widget>
 
 	Options:
-		images - (array) The url or Elements of the images.
+		images - (array) The url or Elements of the images. Or a tag name like 'a'.
 		period - (number) The duration of the intervals between images (ms).
 		duration - (number) The duration of the transition (ms).
 		transition - (object) Transition type (see Fx.Transitions).
@@ -1120,6 +1120,11 @@ Tuiny.Slideshow = new Class(
 					});
 				}
 			});
+		}
+		// options : { images: 'a' } retrieves every 'a' element instead of 'img'
+		else if ( instanceOf( this.images, String ) )
+		{
+			this.images = this.container.getElements( this.options.images );
 		}
 		// Otherwise, we take img Elements from the container
 		else
