@@ -1,0 +1,288 @@
+/* Tuiny Default Theme */
+
+/* Properties marked « ! » are important. You should not edit these ! */
+
+/* Tuiny.Frame */
+
+.tuiny-frame
+{
+	position: absolute; /* ! */
+	font-family: sans-serif;
+	font-size: 12px;
+	margin: 0;
+	padding: 0;
+	color: white;
+	background: #111;
+	border: 1px solid black;
+	-moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px;
+	-moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5); box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+.tuiny-frame .tuiny-content
+{
+	overflow: auto; /* ! */
+	margin: 8px;
+	border: 1px solid black;
+	background: #222;
+}
+
+.tuiny-frame .tuiny-resizer-nw
+{
+	position: absolute; /* ! */
+	top: 0px; /* ! */
+	right: auto; /* ! */
+	bottom: auto; /* ! */
+	left: 0px; /* ! */
+	width: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: nw-resize;
+}
+
+.tuiny-frame .tuiny-resizer-n
+{
+	position: absolute; /* ! */
+	top: 0px; /* ! */
+	right: 8px; /* ! */
+	bottom: auto; /* ! */
+	left: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: n-resize;
+}
+
+.tuiny-frame .tuiny-resizer-ne
+{
+	position: absolute; /* ! */
+	top: 0px; /* ! */
+	right: 0px; /* ! */
+	bottom: auto; /* ! */
+	left: auto; /* ! */
+	width: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: ne-resize;
+}
+
+.tuiny-frame .tuiny-resizer-e
+{
+	position: absolute; /* ! */
+	top: 8px; /* ! */
+	right: 0px; /* ! */
+	bottom: 8px; /* ! */
+	left: auto; /* ! */
+	width: 8px; /* ! */
+	cursor: e-resize;
+}
+
+.tuiny-frame .tuiny-resizer-se
+{
+	position: absolute; /* ! */
+	top: auto; /* ! */
+	right: 0px; /* ! */
+	bottom: 0px; /* ! */
+	left: auto; /* ! */
+	width: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: se-resize;
+}
+
+.tuiny-frame .tuiny-resizer-s
+{
+	position: absolute; /* ! */
+	top: auto; /* ! */
+	right: 8px; /* ! */
+	bottom: 0px; /* ! */
+	left: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: s-resize;
+}
+
+.tuiny-frame .tuiny-resizer-sw
+{
+	position: absolute; /* ! */
+	top: auto; /* ! */
+	right: auto; /* ! */
+	bottom: 0px; /* ! */
+	left: 0px; /* ! */
+	width: 8px; /* ! */
+	height: 8px; /* ! */
+	cursor: sw-resize;
+}
+
+.tuiny-frame .tuiny-resizer-w
+{
+	position: absolute; /* ! */
+	top: 8px; /* ! */
+	right: auto; /* ! */
+	bottom: 8px; /* ! */
+	left: 0px; /* ! */
+	width: 8px; /* ! */
+	cursor: w-resize;
+}
+
+.tuiny-frame .tuiny-resizer-disabled
+{
+	cursor: default;
+}
+
+/* Tuiny.Panel */
+
+.tuiny-panel .tuiny-wrapper
+{
+	margin: 0;
+}
+
+.tuiny-panel .tuiny-header
+{
+	margin: 8px 8px 0px 8px;
+}
+
+.tuiny-panel .tuiny-content
+{
+	margin: 0px 8px; /* Redefinition */
+}
+
+.tuiny-panel .tuiny-footer
+{
+	margin: 0px 8px 8px 8px;
+}
+
+/* Tuiny.Window */
+
+.tuiny-panel .tuiny-header
+{
+	border-top: 1px solid black;
+	margin: 0px 8px;
+}
+
+.tuiny-window .tuiny-label
+{
+	overflow: hidden; /* ! */
+	cursor: move;
+	font-size: 13px;
+	text-align: center;
+	margin: 8px 8px 2px 8px;
+	padding: 0;
+	color: #ccc;
+}
+
+.tuiny-window .tuiny-controlbar
+{
+	position: absolute; /* ! */
+	left: 8px; /* Or right */
+	top: 8px;
+	margin: 0;
+	padding: 0;
+}
+
+.tuiny-window .tuiny-controlbar .tuiny-button
+{
+	font-size: 9px;
+	margin: 0px 2px;
+	padding: 0;
+	color: white;
+	background: #333;
+	border: 1px solid black;
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+}
+
+.tuiny-window .tuiny-controlbar .tuiny-button:active
+{
+	position: relative;
+	top: 1px;
+	background: #000;
+}
+
+/* Tuiny.Toolbar */
+
+.tuiny-toolbar
+{
+	display: block;
+	width: 100%;
+	overflow: hidden;
+}
+
+.tuiny-toolbar .tuiny-button
+{
+	margin: 3px;
+	padding: 0px;
+	color: white;
+	background: #333;
+	border: 1px solid black;
+	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+}
+
+.tuiny-toolbar .tuiny-button:active
+{
+	position: relative;
+	top: 1px;
+	background: #000;
+}
+
+/* Tuiny.Table */
+
+.tuiny-table
+{
+	font-size: 12px;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+.tuiny-table th
+{
+	background: #333;
+	border-bottom: 1px solid black;
+}
+
+.tuiny-table-tr-odd
+{
+	background: #666;
+}
+
+.tuiny-table-tr-selected
+{
+	color: black;
+	background: #ccc;
+}
+
+.tuiny-table-tr-hovered
+{
+	background: #999;
+}
+
+/* Tuiny.Slideshow */
+
+.tuiny-slideshow
+{
+	width: 600px;
+	height: 400px;
+	background: black;
+	border: 8px solid white;
+}
+
+.tuiny-slideshow img
+{
+	position: absolute; /* ! */
+	width: 600px;
+	height: 400px;
+}
+
+/* Tuiny.Tree */
+
+.tuiny-tree
+{
+}
+
+.tuiny-tree-clone
+{
+	position: absolute; /* ! */
+	opacity: 0.7;
+}
+
+.tuiny-tree-cart
+{
+	background: #cce;
+}
