@@ -3,6 +3,12 @@
 
 	A simple slideshow class.
 
+	Date:
+		2011-07-20
+
+	Author:
+		Charly Lersteau
+
 	Options:
 		period - (number) The duration of the intervals between slides (ms).
 		fx - (string) Default transition effect (default: 'crossFade').
@@ -13,6 +19,25 @@
 			(default: 'tuiny-slideshow').
 		classSlide - (string) The class of the slides contained when
 			javascript is enabled (default: 'tuiny-slideshow-slide').
+
+	CSS example:
+		Example of a 600x400 slideshow to center and auto-scale images.
+		>	#slideshow
+		>	{
+		>		width: 600px;
+		>		height: 400px;
+		>	}
+		>	#slideshow .tuiny-slideshow-slide
+		>	{
+		>		text-align: center;
+		>		line-height: 400px;
+		>	}
+		>	#slideshow .tuiny-slideshow-slide img
+		>	{
+		>		max-width: 100%;
+		>		max-height: 100%;
+		>		vertical-align: middle;
+		>	}
 */
 var Slideshow = new Class(
 {
