@@ -4,14 +4,14 @@
 	A simple slideshow class.
 
 	Date:
-		2011-07-20
+		2011-07-27
 
 	Author:
 		Charly Lersteau
 
 	Options:
 		period - (number) The duration of the intervals between slides (ms).
-		fx - (string) Default transition effect (default: 'crossFade').
+		fx - (string) Default transition effect (default: 'fade').
 		fxOptions - (object) Effect options, please see Mootools Core Fx
 			(default: link:'cancel',duration:'long').
 		autoplay - (bool) Play at startup (default: true).
@@ -19,6 +19,11 @@
 			(default: 'tuiny-slideshow').
 		classSlide - (string) The class of the slides contained when
 			javascript is enabled (default: 'tuiny-slideshow-slide').
+
+	Requires:
+		- Core/Options
+		- Core/Events
+		- /Class.Occlude
 
 	CSS example:
 		Example of a 600x400 slideshow to center and auto-scale images.
@@ -41,12 +46,12 @@
 */
 var Slideshow = new Class(
 {
-	Implements: [ Options, Events ],
+	Implements: [ Options, Events, Class.Occlude ],
 
 	options:
 	{
 		period: 3000,
-		fx: 'crossFade',
+		fx: 'fade',
 		fxOptions:
 		{
 			link: 'cancel',
@@ -56,6 +61,8 @@ var Slideshow = new Class(
 		classSlideshow: 'tuiny-slideshow',
 		classSlide: 'tuiny-slideshow-slide'
 	},
+
+	property: 'tuiny',
 
 	/*
 		Constructor: Slideshow
@@ -71,12 +78,14 @@ var Slideshow = new Class(
 	{
 		this.setOptions( options );
 		this.element = document.id( element );
+
+		if ( this.occlude() )
+			return this.occluded;
+
 		this.build();
 
 		if ( this.options.autoplay )
-		{
 			this.play();
-		}
 	},
 
 	/*
@@ -115,7 +124,7 @@ var Slideshow = new Class(
 		Method: show
 
 		Syntax:
-			> mySlideshow.show( slide );
+			> mySlideshow.show( slide, [options] );
 
 		Parameters:
 			slide - (Element|Number|String) Slide element to show.
@@ -123,21 +132,19 @@ var Slideshow = new Class(
 					a reference to a slide element,
 					a number: 0, 1, 2, ...,
 					a string: 'first', 'last', 'previous', 'next'.
+			options - (object) Some options ({ skipFx: <boolean> }).
 
 		Returns:
 			this
 	*/
-	show: function( slide, callback )
+	show: function( slide, options )
 	{
-		if ( this.interval && !callback )
+		options = options || {};
+
+		// Prevents from breaking period in play mode.
+		if ( this.interval && ( !options || !options._callback ) )
 		{
 			this.resetInterval();
-		}
-
-		if ( this.fxRunning && instanceOf( this.fx, Fx ) )
-		{
-			this.fx.cancel();
-			this.fxComplete();
 		}
 
 		if ( instanceOf( slide, String ) )
@@ -149,6 +156,38 @@ var Slideshow = new Class(
 			slide = this.slides[ slide ];
 		}
 
+		var imgOptions = slide.retrieve( 'tuiny.slideshow.img' );
+		if ( imgOptions && imgOptions.src )
+		{
+			var image;
+			var onLoad = function() {
+				slide.empty().grab( image );
+				// Allow auto-size by CSS
+				image.removeProperties( 'width', 'height' ).setStyle( 'visibility', 'visible' );
+				this.display( slide, options );
+			}.bind( this );
+
+			// Dynamically load image
+			image = Asset.image( imgOptions.src, Object.merge( imgOptions, { onLoad: onLoad } ) );
+			slide.eliminate( 'tuiny.slideshow.img' );
+		}
+		else
+		{
+			this.display( slide, options );
+		}
+		return this;
+	},
+
+	display: function( slide, options )
+	{
+		if ( slide == this.current ) return;
+
+		if ( this.fxRunning && instanceOf( this.fx, Fx ) )
+		{
+			this.fx.cancel();
+			this.fxComplete();
+		}
+
 		var previous = this.current.setStyle( 'z-index', 1 );
 		this.current = slide;
 		this.reset( slide );
@@ -157,7 +196,7 @@ var Slideshow = new Class(
 
 		this.fireEvent( 'show', [ slide, this.slides.indexOf( slide ) ] );
 
-		if ( instanceOf( this.fx, Fx ) )
+		if ( !options.skipFx && instanceOf( this.fx, Fx ) )
 		{
 			this.fxRunning = true;
 			this.fx.start({
@@ -180,7 +219,7 @@ var Slideshow = new Class(
 
 	setInterval: function()
 	{
-		this.interval = this.show.periodical( this.options.period, this, [ 'next', true ] );
+		this.interval = this.show.periodical( this.options.period, this, [ 'next', { _callback: true } ] );
 		return this;
 	},
 
@@ -231,7 +270,11 @@ var Slideshow = new Class(
 	{
 		this.slides.each( function( slide )
 		{
-			if ( slide != this.current )
+			if ( slide == this.current )
+			{
+				this.reset( slide );
+			}
+			else
 			{
 				slide.setStyle( 'display', 'none' );
 			}
@@ -241,6 +284,8 @@ var Slideshow = new Class(
 
 	build: function()
 	{
+		this.element.store( 'tuiny', this );
+
 		this.element.setStyles(
 		{
 			'position': 'relative', // Needed to set slide size to 100%
@@ -252,17 +297,19 @@ var Slideshow = new Class(
 		this.slides.each( function( slide, index )
 		{
 			// Parse class attribute values (name:<JSON value> ...)
+			// To put spaces into value, please use '&#160;' code.
 			var options = {};
 			var data = slide.get( 'class' ).split( ' ' );
 
 			data.each( function( s )
 			{
-				var split = s.split( ':' );
-				if ( split[ 1 ] && split[ 0 ] )
+				var pos = s.indexOf( ':' );
+				if ( pos >= 0 )
 				{
+					var name = s.substr( 0, pos ), value = s.substr( pos + 1 );
 					try
 					{
-						options[ split[ 0 ] ] = JSON.decode( split[ 1 ] );
+						options[ name ] = JSON.decode( value );
 					}
 					catch ( e )
 					{
@@ -288,8 +335,8 @@ var Slideshow = new Class(
 
 			if ( fxClass )
 			{
-				var options = Object.merge( this.options.fxOptions, options.fxOptions );
-				var fx = new fxClass( slide, options );
+				var fxOptions = Object.merge( this.options.fxOptions, options.fxOptions );
+				var fx = new fxClass( slide, fxOptions );
 				fx.addEvent( 'complete', this.fxComplete.bind( this ) );
 				slide.store( 'tuiny.slideshow.fx', fx );
 			}
@@ -298,6 +345,19 @@ var Slideshow = new Class(
 			if ( index > 0 )
 			{
 				slide.setStyle( 'display', 'none' );
+			}
+
+			// Will load image after
+			if ( options.img )
+			{
+				if ( index > 0 )
+				{
+					slide.store( 'tuiny.slideshow.img', options.img );
+				}
+				else
+				{
+					slide.grab( new Element( 'img', options.img ) );
+				}
 			}
 
 			slide.store( 'tuiny.slideshow.options', options );
@@ -360,6 +420,8 @@ Slideshow.Fx.crossFade = new Class(
 	start: function( data )
 	{
 		this.previous = data.previous;
+		this.previous.setStyle( 'z-index', 1 );
+		this.next.setStyle( 'z-index', 0 );
 		this.parent( 0, 1 );
 		return this;
 	},
@@ -437,20 +499,9 @@ Slideshow.Fx.matrixBase = new Class(
 	{
 		this.parent( next, options );
 
-		this.matrix = new Array;
 		this.count  = this.options.rows * this.options.cols;
 
-		for ( var i = 0; i < this.count; i++ )
-		{
-			this.matrix.push( this.next.clone()
-				.setStyles({
-					'display': 'none',
-					'z-index': 1
-				})
-				.inject( this.next, 'after' )
-			);
-		}
-
+		this.create();
 		this.resize();
 
 		this.addEvent( 'complete', this.end );
@@ -460,6 +511,11 @@ Slideshow.Fx.matrixBase = new Class(
 
 	start: function( data )
 	{
+		if ( this.matrix[ 0 ].get( 'html' ) != this.next.get( 'html' ) )
+		{
+			this.destroy().create();
+		}
+
 		if ( this.size != this.next.getSize() )
 		{
 			this.resize();
@@ -501,6 +557,29 @@ Slideshow.Fx.matrixBase = new Class(
 		return s;
 	},
 
+	create: function()
+	{
+		this.matrix = new Array;
+		for ( var i = 0; i < this.count; i++ )
+		{
+			this.matrix.push( this.next.clone()
+				.setStyles({
+					'display': 'none',
+					'z-index': 1
+				})
+				.inject( this.next, 'after' )
+			);
+		}
+		return this;
+	},
+
+	destroy: function()
+	{
+		new Elements( this.matrix ).destroy();
+		this.matrix = null;
+		return this;
+	},
+
 	resize: function()
 	{
 		this.size = this.next.getSize();
@@ -515,6 +594,7 @@ Slideshow.Fx.matrixBase = new Class(
 				this.matrix[ k ].setStyle( 'clip', this.rect( i, j, w, h ) );
 			}
 		}
+		return this;
 	},
 
 	rect: function( i, j, w, h )
