@@ -99,7 +99,7 @@ var Slideshow = new Class(
 	*/
 	play: function()
 	{
-		this.setInterval();
+		this.resetInterval();
 		this.fireEvent( 'play' );
 		return this;
 	},
@@ -217,12 +217,6 @@ var Slideshow = new Class(
 		return this;
 	},
 
-	setInterval: function()
-	{
-		this.interval = this.show.periodical( this.options.period, this, [ 'next', { _callback: true } ] );
-		return this;
-	},
-
 	clearInterval: function()
 	{
 		clearInterval( this.interval );
@@ -232,7 +226,11 @@ var Slideshow = new Class(
 
 	resetInterval: function()
 	{
-		this.clearInterval().setInterval();
+		if ( this.interval )
+		{
+			this.clearInterval();
+		}
+		this.interval = this.show.periodical( this.options.period, this, [ 'next', { _callback: true } ] );
 		return this;
 	},
 
